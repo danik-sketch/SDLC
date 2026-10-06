@@ -1,0 +1,77 @@
+@startuml
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor<<View>> #FDEBD0
+  BorderColor<<View>> #E67E22
+  BackgroundColor<<Controller>> #D5F5E3
+  BorderColor<<Controller>> #27AE60
+  BackgroundColor<<Model>> #D6EAF8
+  BorderColor<<Model>> #2E86C1
+}
+
+class Form1 <<View>> {
+  -btnInputData : Button
+  -btnGenerate : Button
+  -lblParamsInfo : Label
+  -txtResults : TextBox
+  -_controller : Controller
+  -_model : Model
+  --
+  +Form1()
+  -SetupUI() : void
+  -OnModelDataChanged() : void
+  -OnModelValidationError(errorMessage : string) : void
+}
+
+class Controller <<Controller>> {
+  -_model : Model
+  --
+  +Controller(model : Model)
+  +HandleInputData(owner : IWin32Window) : void
+  +HandleGenerate() : void
+}
+
+class Model <<Model>> {
+  +CurrentSettings : PasswordSettings <<get>>
+  +GeneratedPasswords : List<string> <<get>>
+  +DataChanged : event Action
+  +ValidationError : event Action<string>
+  --
+  +ValidateSettings(settings : PasswordSettings) : bool
+  +SaveSettings(settings : PasswordSettings) : bool
+  +Generate() : void
+}
+
+class PasswordSettings <<Model>> {
+  +Length : int
+  +Count : int
+  +IncludeUppercase : bool
+  +IncludeLowercase : bool
+  +IncludeDigits : bool
+  +IncludeSpecial : bool
+}
+
+class InputDialogForm <<View>> {
+  -numLength : NumericUpDown
+  -numCount : NumericUpDown
+  -chkUpper : CheckBox
+  -chkLower : CheckBox
+  -chkDigits : CheckBox
+  -chkSpecial : CheckBox
+  -btnSave : Button
+  -btnCancel : Button
+  +Settings : PasswordSettings <<get>>
+  --
+  +InputDialogForm(initialSettings : PasswordSettings)
+  -LoadSettings(settings : PasswordSettings) : void
+  -BtnSave_Click(sender, e) : void
+}
+
+Form1 ..> Controller : creates
+Form1 --> Model : has
+Controller --> Model : has
+Controller ..> InputDialogForm : creates
+Model --> PasswordSettings : uses
+InputDialogForm --> PasswordSettings : creates
+@enduml
